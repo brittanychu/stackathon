@@ -10,17 +10,22 @@ import {
   Text,
   View,
   TouchableHighlight,
+  Button,
   Image
 } from 'react-native';
 import styles from './stylesheet';
 import ImagePicker from 'react-native-image-picker';
 import Clarifai from 'clarifai';
-import apiKey from './secrets'
+import {clarifaiApiKey, musixmatchApiKey} from './secrets';
+import Musixmatch from 'musixmatch-node'
 
 const app = new Clarifai.App({
-  apiKey: apiKey
+  apiKey: clarifaiApiKey
 });
 process.nextTick = setImmediate;
+
+const mxm = new Musixmatch(musixmatchApiKey);
+console.log('mxm', mxm)
 
 const options = {
   title: 'Select an Image',
@@ -30,15 +35,22 @@ const options = {
   maxWidth: 480
 };
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max))
+}
+
 type Props = {};
 export default class App extends Component<Props> {
   constructor() {
     super();
     this.state = { 
       imageSource: 'https://community.clarifai.com/uploads/default/_emoji/clarifai.png',
-      tagText: ''
+      tagText: [],
+      selectedTag: '',
+      lyricText: ''
     };
-
+    this.selectImage = this.selectImage.bind(this);
+    this.lyricSearch = this.lyricSearch.bind(this);
   }
 
   selectImage() {
@@ -55,9 +67,12 @@ export default class App extends Component<Props> {
         app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data }).then(
           (res) => {
             console.log('Clarifai response = ', res);
-            let tags = '';
+            let tags = [];
+            // for (let i = 0; i < res.outputs[0].data.concepts.length; i++) {
+            //   tags += res.outputs[0].data.concepts[i].name + ' ';
+            // }
             for (let i = 0; i < res.outputs[0].data.concepts.length; i++) {
-              tags += res.outputs[0].data.concepts[i].name + ' ';
+              tags.push(res.outputs[0].data.concepts[i].name)
             }
             console.log('tags', tags)
             this.setState({ tagText: tags });
@@ -67,6 +82,15 @@ export default class App extends Component<Props> {
           });
       }
     });
+  }
+
+  lyricSearch(tag, evt){
+    mxm.searchTrack({q: tag})
+      .then(res => {
+        const index = getRandomInt(res.message.body.track_list.length)
+        const trackId = res.message.body.track_list[index].track.track_id
+        
+      })
   }
 
   render() {
@@ -90,10 +114,20 @@ export default class App extends Component<Props> {
           source={{ uri: this.state.imageSource }}
           style={styles.image}
           />
-          <TouchableHighlight onPress={this.selectImage.bind(this)}>
-            <Text>Select an image</Text>
-          </TouchableHighlight>
-          <Text>{this.state.tagText}</Text>
+          <Button 
+            onPress={this.selectImage} 
+            title="Select an image"
+          />
+          <Text>{this.state.tagText.map((tag, i) => {
+            return (
+              <Button
+              onPress={()=> this.lyricSearch(tag)}
+              key={i} 
+              title={tag}
+              />
+            )
+          })}</Text>
+          <Text>{this.state.lyricText}</Text>
         </View>
         <View style={styles.footer}></View>
       </View>
