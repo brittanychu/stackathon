@@ -1,11 +1,16 @@
 import { StyleSheet } from 'react-native';
 
 export default styles = StyleSheet.create({
-  container: {
+  backgroundImage: {
     flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+  },
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
   header: {
     flex: 1,
@@ -13,9 +18,11 @@ export default styles = StyleSheet.create({
     height: 30
   },
   logo: {
-    fontSize: 20,
+    fontFamily: 'Futura',
+    fontSize: 50,
     textAlign: 'center',
-    margin: 30,
+    margin: 40,
+    zIndex: 1
   },
   body: {
     flex: 1,

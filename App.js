@@ -118,13 +118,14 @@ export default class App extends Component<Props> {
         })
       })
   }
-
+  
   render() {
     return (
       <View style={styles.container}>
+        <Image source={require('./images/PhotoApr172C74524PM.jpg')} style={styles.backgroundImage} />
         <View style={styles.header}>
           <Text style={styles.logo}>
-            Insta-caption
+            Subtitle
           </Text>
         </View>
         {this.state.imageSource === ' ' ?
