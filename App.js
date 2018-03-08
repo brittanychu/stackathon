@@ -11,7 +11,8 @@ import {
   View,
   TouchableHighlight,
   Button,
-  Image
+  Image,
+  ImageBackground
 } from 'react-native';
 import styles from './stylesheet';
 import ImagePicker from 'react-native-image-picker';
@@ -122,7 +123,7 @@ export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Image source={require('./images/PhotoApr172C74524PM.jpg')} style={styles.backgroundImage} />
+        <ImageBackground source={require('./images/PhotoApr172C74524PM.jpg')} style={styles.backgroundImage}>
         <View style={styles.header}>
           <Text style={styles.logo}>
             Subtitle
@@ -149,17 +150,21 @@ export default class App extends Component<Props> {
             onPress={this.selectImage} 
             title="Select an image"
           />
-          <Text>{this.state.tagText.map((tag, i) => {
-            return (
-              <Button
-              onPress={()=> this.lyricSearch(tag)}
-              key={i} 
-              title={tag}
-              />
-            )
-          })}</Text>
-          <Text>{this.state.lyricText}</Text>
+          <View style={styles.tags}>
+            {this.state.tagText.map((tag, i) => {
+              return (
+                <Button
+                onPress={()=> this.lyricSearch(tag)}
+                key={i} 
+                title={tag}
+                style={styles.tag}
+                />
+              )
+            })}
+          </View>
+          <Text style={styles.lyric}>{this.state.lyricText}</Text>
         <View style={styles.footer}></View>
+        </ImageBackground>
       </View>
     );
   }

@@ -40,5 +40,22 @@ export default styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200
+  },
+  tags: {
+    flex: 1,
+    justifyContent:'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    flexWrap: 'wrap',
+    margin: 10,
+    padding: 10,
+    width: 300
+  },
+  tag: {
+    alignSelf: 'center',
+  },
+  lyric: {
+    color: '#ffffff',
+    fontSize: 20
   }
 });
