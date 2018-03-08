@@ -44,9 +44,8 @@ export default class App extends Component<Props> {
   constructor() {
     super();
     this.state = { 
-      imageSource: 'https://community.clarifai.com/uploads/default/_emoji/clarifai.png',
+      imageSource: ' ',
       tagText: [],
-      selectedTag: '',
       lyricText: ''
     };
     this.selectImage = this.selectImage.bind(this);
@@ -55,7 +54,6 @@ export default class App extends Component<Props> {
 
   selectImage() {
     ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
       }
@@ -63,10 +61,9 @@ export default class App extends Component<Props> {
         console.log('ImagePicker Error: ', response.error);
       }
       else {
-        this.setState({ imageSource: response.uri.replace('file://', '') })
+        this.setState({ imageSource: response.uri.replace('file://', ''), tagText: [], lyricText: '' })
         app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data }).then(
           (res) => {
-            console.log('Clarifai response = ', res);
             let tags = [];
             // for (let i = 0; i < res.outputs[0].data.concepts.length; i++) {
             //   tags += res.outputs[0].data.concepts[i].name + ' ';
@@ -74,7 +71,6 @@ export default class App extends Component<Props> {
             for (let i = 0; i < res.outputs[0].data.concepts.length; i++) {
               tags.push(res.outputs[0].data.concepts[i].name)
             }
-            console.log('tags', tags)
             this.setState({ tagText: tags });
           },
           (error) => {
@@ -85,11 +81,41 @@ export default class App extends Component<Props> {
   }
 
   lyricSearch(tag, evt){
-    mxm.searchTrack({q: tag})
+    mxm.searchTrack({q_lyrics: tag, f_lyrics_language: 'en'})
       .then(res => {
         const index = getRandomInt(res.message.body.track_list.length)
         const trackId = res.message.body.track_list[index].track.track_id
-        
+        return trackId;
+      })
+      .then(id => {
+        let results = [];
+        mxm.getTrackLyrics(id)
+        .then(res => {
+          return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
+        })
+        .then(lyricArray => {
+          lyricArray.forEach(lyric => {
+            let line = lyric.split(' ');
+            let found = line.find(word => {
+              if(word[word.length-1] === ','){
+                word = word.slice(-1);
+              }
+              return tag === word.toLowerCase()
+            });
+            if(found){
+              results.push(lyric)
+            } 
+          })
+          if(!results.length){
+            let index = getRandomInt(lyricArray.length-4)
+            if(lyricArray[index]){
+              results.push(lyricArray[index]);
+            } else {
+              results.push('Oops! Try Again!')
+            }
+          }
+          this.setState({lyricText: results[getRandomInt(results.length)]})
+        })
       })
   }
 
@@ -101,6 +127,7 @@ export default class App extends Component<Props> {
             Insta-caption
           </Text>
         </View>
+        {this.state.imageSource === ' ' ?
         <View style={styles.body}>
           <Text style={styles.instructions}>
             Need a caption?
@@ -109,11 +136,14 @@ export default class App extends Component<Props> {
             Upload your photo to get started! 
           </Text>
         </View>
+        :
         <View style={styles.container}>
           <Image
           source={{ uri: this.state.imageSource }}
           style={styles.image}
           />
+        </View>
+        }
           <Button 
             onPress={this.selectImage} 
             title="Select an image"
@@ -128,7 +158,6 @@ export default class App extends Component<Props> {
             )
           })}</Text>
           <Text>{this.state.lyricText}</Text>
-        </View>
         <View style={styles.footer}></View>
       </View>
     );
