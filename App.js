@@ -66,9 +66,6 @@ export default class App extends Component<Props> {
         app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data }).then(
           (res) => {
             let tags = [];
-            // for (let i = 0; i < res.outputs[0].data.concepts.length; i++) {
-            //   tags += res.outputs[0].data.concepts[i].name + ' ';
-            // }
             for (let i = 0; i < res.outputs[0].data.concepts.length; i++) {
               tags.push(res.outputs[0].data.concepts[i].name)
             }
@@ -121,16 +118,16 @@ export default class App extends Component<Props> {
   }
   
   render() {
+    // <ImageBackground source={require('./images/PhotoApr172C74524PM.jpg')} style={styles.backgroundImage}>
     return (
       <View style={styles.container}>
-        <ImageBackground source={require('./images/PhotoApr172C74524PM.jpg')} style={styles.backgroundImage}>
         <View style={styles.header}>
           <Text style={styles.logo}>
             Subtitle
           </Text>
         </View>
-        {this.state.imageSource === ' ' ?
-        <View style={styles.body}>
+        {this.state.imageSource === ' ' 
+        ? <View style={styles.body}>
           <Text style={styles.instructions}>
             Need a caption?
           </Text>
@@ -138,33 +135,30 @@ export default class App extends Component<Props> {
             Upload your photo to get started! 
           </Text>
         </View>
-        :
-        <View style={styles.container}>
+        : <View style={styles.container}>
           <Image
           source={{ uri: this.state.imageSource }}
           style={styles.image}
           />
-        </View>
-        }
-          <Button 
-            onPress={this.selectImage} 
-            title="Select an image"
-          />
-          <View style={styles.tags}>
-            {this.state.tagText.map((tag, i) => {
-              return (
-                <Button
+        </View>}
+        <Button 
+          onPress={this.selectImage} 
+          title="Select an image"
+        />
+        <View style={styles.tags}>
+          {this.state.tagText.map((tag, i) => {
+            return (
+              <Button
                 onPress={()=> this.lyricSearch(tag)}
                 key={i} 
-                title={tag}
-                style={styles.tag}
-                />
-              )
-            })}
-          </View>
-          <Text style={styles.lyric}>{this.state.lyricText}</Text>
+                title={`#${tag}`}
+                style={styles.tag} 
+              />
+            )
+          })}
+        </View>
+        <Text style={styles.lyric}>{this.state.lyricText}</Text>
         <View style={styles.footer}></View>
-        </ImageBackground>
       </View>
     );
   }

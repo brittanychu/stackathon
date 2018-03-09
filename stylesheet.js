@@ -45,17 +45,18 @@ export default styles = StyleSheet.create({
     flex: 1,
     justifyContent:'center',
     alignItems: 'center',
-    textAlign: 'center',
     flexWrap: 'wrap',
-    margin: 10,
-    padding: 10,
-    width: 300
+    margin: 5,
+    padding: 5,
+    flexDirection: 'row'
   },
   tag: {
-    alignSelf: 'center',
+    fontSize: 16
   },
   lyric: {
-    color: '#ffffff',
-    fontSize: 20
+    // color: '#ffffff',
+    fontSize: 20,
+    margin: 5,
+    padding: 5
   }
 });
