@@ -41,9 +41,10 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      imageSource: ' ',
+      imageSource: 'https://is3-ssl.mzstatic.com/image/thumb/Purple122/v4/c2/91/3c/c2913ccb-1918-e4a3-de78-ca6d2383b468/source/256x256bb.jpg',
       tagText: [],
       lyricText: '',
+      artist: ''
     };
     this.selectImage = this.selectImage.bind(this);
     this.lyricSearch = this.lyricSearch.bind(this);
@@ -79,6 +80,8 @@ export default class App extends Component {
       .then(res => {
         const index = getRandomInt(res.message.body.track_list.length)
         const trackId = res.message.body.track_list[index].track.track_id
+        const trackArtist = res.message.body.track_list[index].track.artist_name
+        this.setState({artist: trackArtist})
         return trackId;
       })
       .then(id => {
@@ -96,13 +99,13 @@ export default class App extends Component {
                 }
                 return tag === word.toLowerCase()
               });
-              if (found) {
+              if (found && line.length > 2) {
                 results.push(lyric)
               }
             })
             if (!results.length) {
               let index = getRandomInt(lyricArray.length - 4)
-              if (lyricArray[index]) {
+              if (lyricArray[index] && lyricArray[index].split(' ').length > 2) {
                 results.push(lyricArray[index]);
               } else {
                 results.push('Oops! Try Again!')
@@ -126,11 +129,10 @@ export default class App extends Component {
     
     return (
       <View style={styles.container}>
-          <Image
-            source={{ uri: this.state.imageSource }}
-            style={styles.image}
-          />
-
+        <Image
+          source={{ uri: this.state.imageSource }}
+          style={styles.image}
+        />
         <Button
           onPress={this.selectImage}
           title="Select an image"
@@ -154,12 +156,13 @@ export default class App extends Component {
         </Carousel>
         { this.state.lyricText 
           ? <View>
-          <Text>Suggested Caption:</Text>
+          <Text style={styles.instructions}>Suggested Caption:</Text>
           <Button
             style={styles.lyric}
             title={`"${this.state.lyricText}"`}
             onPress={this.writeToCliipboard}
           />
+          <Text style={styles.instructions}>- {this.state.artist}</Text>
           </View>
           : null
         } 

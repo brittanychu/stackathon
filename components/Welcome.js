@@ -11,14 +11,17 @@ import {
 import styles from '../stylesheet';
 
 export default class Welcome extends Component {
-  static navigationOptions = {
-    headerStyle: {
-      backgroundColor: '#000000',
-    },
-    headerTitleStyle: {
-      fontFamily: 'Futura'
-    }
-  }
+  static navigationOptions = { 
+    headerStyle: { 
+      position: 'absolute', 
+      backgroundColor: 'transparent', 
+      zIndex: 100, 
+      top: 0, 
+      left: 0, 
+      right: 0 
+    } 
+  };
+
   render () {
     const { navigate } = this.props.navigation
     return (
@@ -27,10 +30,13 @@ export default class Welcome extends Component {
         <Text style={styles.logo}>
           Subtitle
         </Text>
-        <Button
-          title="Get Started"
-          onPress={()=> navigate('Image')}
-        />
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Get Started"
+            onPress={()=> navigate('Image')}
+            color="#ffffff"
+          />
+        </View>
         </View>
       </ImageBackground>
     )

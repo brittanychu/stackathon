@@ -2,15 +2,15 @@ import { StyleSheet } from 'react-native';
 
 export default styles = StyleSheet.create({
   backgroundImage: {
-    flex: 1,
-    // resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
+    height: '100%'
   },
   container: {
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
+    backgroundColor: '#e6e6e6'
   },
   homeContainer: {
     justifyContent: 'flex-start',
@@ -27,7 +27,8 @@ export default styles = StyleSheet.create({
     fontSize: 50,
     textAlign: 'center',
     margin: 40,
-    zIndex: 1
+    zIndex: 1,
+    marginTop: 200
   },
   body: {
     flex: 1,
@@ -35,7 +36,6 @@ export default styles = StyleSheet.create({
   },
   instructions: {
     textAlign: 'center',
-    color: '#333333',
     margin: 10,
   },
   spacer: {
@@ -46,18 +46,8 @@ export default styles = StyleSheet.create({
     width: '100%',
     height: '50%'
   },
-  // tags: {
-  //   flex: 1,
-  //   justifyContent:'center',
-  //   alignItems: 'center',
-  //   flexWrap: 'wrap',
-  //   margin: 5,
-  //   padding: 5,
-  //   flexDirection: 'row'
-  // },
   tag: {
     fontSize: 16, 
-    // height: 40
   },
   lyric: {
     fontSize: 20,
@@ -66,5 +56,10 @@ export default styles = StyleSheet.create({
   },
   selectImage:{
     margin: 10
+  }, 
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
