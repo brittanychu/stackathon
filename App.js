@@ -40,8 +40,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max))
 }
 
-type Props = {};
-export default class App extends Component<Props> {
+export default class App extends Component {
   constructor() {
     super();
     this.state = { 
