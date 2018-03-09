@@ -3,12 +3,17 @@ import { StyleSheet } from 'react-native';
 export default styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    resizeMode: 'cover',
+    // resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
   },
   container: {
     justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+  },
+  homeContainer: {
+    justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
   },
@@ -33,30 +38,33 @@ export default styles = StyleSheet.create({
     color: '#333333',
     margin: 10,
   },
-  footer: {
+  spacer: {
     flex: 1,
     justifyContent: 'flex-end'
   },
   image: {
-    width: 200,
-    height: 200
+    width: '100%',
+    height: '50%'
   },
-  tags: {
-    flex: 1,
-    justifyContent:'center',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    margin: 5,
-    padding: 5,
-    flexDirection: 'row'
-  },
+  // tags: {
+  //   flex: 1,
+  //   justifyContent:'center',
+  //   alignItems: 'center',
+  //   flexWrap: 'wrap',
+  //   margin: 5,
+  //   padding: 5,
+  //   flexDirection: 'row'
+  // },
   tag: {
-    fontSize: 16
+    fontSize: 16, 
+    // height: 40
   },
   lyric: {
-    // color: '#ffffff',
     fontSize: 20,
     margin: 5,
     padding: 5
+  },
+  selectImage:{
+    margin: 10
   }
 });
