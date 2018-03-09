@@ -45,11 +45,10 @@ export default class App extends Component {
       tagText: [],
       lyricText: '',
       artist: '',
-      selectedSongId: null,
+      selectedSong: {},
       songs: []
     };
     this.selectImage = this.selectImage.bind(this);
-    // this.lyricSearch = this.lyricSearch.bind(this);
     this.chooseSong = this.chooseSong.bind(this);
     this.checkSongLyrics = this.checkSongLyrics.bind(this);
     this.setTrackIds = this.setTrackIds.bind(this)
@@ -85,79 +84,52 @@ export default class App extends Component {
       .then(res => {
         let ids = [];
         res.message.body.track_list.forEach(song => {
-          ids.push(song.track.track_id);
+          ids.push({
+            id: song.track.track_id,
+            artist: song.track.artist_name
+          });
         })
-        this.setState({songs: ids})
-        .then(_ => this.chooseSong(tag))
+        this.setState({ songs: ids }, () => this.chooseSong(tag))
       })
   }
 
   chooseSong(tag) {
-      const index = getRandomInt(this.state.songs.length);
-      let id = this.state.songs[index];
-      this.setState({selectedSongId: id})
-      .then(_ => {
-        return this.checkSongLyrics(this.state.selectedSongId, tag)
-      })
+    const index = getRandomInt(this.state.songs.length);
+    let {id, artist} = this.state.songs[index];
+    this.setState({ selectedSong: { id, artist } }, 
+      () => this.checkSongLyrics(this.state.selectedSong, tag))
     }
 
-  checkSongLyrics(id, tag){
-      let results = [];
-      mxm.getTrackLyrics(id)
-      .then(res => {
-        return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
-      })
-      .then(lyricArray => {
-        lyricArray.forEach(lyric => {
-          let line = lyric.split(' ');
-          let found = line.find(word => {
-            if (word[word.length - 1] === ',') {
-              word = word.slice(-1);
-            }
-            return tag === word.toLowerCase()
-          });
-          if (found && line.length > 2) {
-            results.push(lyric)
+  checkSongLyrics(song, tag){
+    console.log(song.artist)
+    let results = [];
+    mxm.getTrackLyrics(song.id)
+    .then(res => {
+      return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
+    })
+    .then(lyricArray => {
+      lyricArray.forEach(lyric => {
+        let line = lyric.split(' ');
+        let found = line.find(word => {
+          if (word[word.length - 1] === ',') {
+            word = word.slice(-1);
           }
-        })
-        if(!results.length){
-          return this.chooseSong(tag)
-        } else {
-          this.setState({ lyricText: results[getRandomInt(results.length)] })
+          return tag === word.toLowerCase()
+        });
+        if (found && line.length > 2) {
+          results.push(lyric)
         }
       })
+      if(!results.length){
+        return this.chooseSong(tag)
+      } else {
+        this.setState({ 
+          lyricText: results[getRandomInt(results.length)],
+          artist: song.artist
+        })
+      }
+    })
   }
-      // .then(id => {
-      //   let results = [];
-      //   mxm.getTrackLyrics(id)
-      //     .then(res => {
-      //       return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
-      //     })
-      //     .then(lyricArray => {
-      //       lyricArray.forEach(lyric => {
-      //         let line = lyric.split(' ');
-      //         let found = line.find(word => {
-      //           if (word[word.length - 1] === ',') {
-      //             word = word.slice(-1);
-      //           }
-      //           return tag === word.toLowerCase()
-      //         });
-      //         if (found && line.length > 2) {
-      //           results.push(lyric)
-      //         }
-      //       })
-  //           if (!results.length) {
-  //             let index = getRandomInt(lyricArray.length - 4)
-  //             if (lyricArray[index] && lyricArray[index].split(' ').length > 2) {
-  //               results.push(lyricArray[index]);
-  //             } else {
-  //               results.push('Oops! Try Again!')
-  //             }
-  //           }
-  //           this.setState({ lyricText: results[getRandomInt(results.length)] })
-  //         })
-  //     })
-  // }
   
   writeToCliipboard = async () => {
     await Clipboard.setString(this.state.lyricText)
