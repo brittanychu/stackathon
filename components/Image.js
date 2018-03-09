@@ -44,10 +44,15 @@ export default class App extends Component {
       imageSource: 'https://is3-ssl.mzstatic.com/image/thumb/Purple122/v4/c2/91/3c/c2913ccb-1918-e4a3-de78-ca6d2383b468/source/256x256bb.jpg',
       tagText: [],
       lyricText: '',
-      artist: ''
+      artist: '',
+      selectedSongId: null,
+      songs: []
     };
     this.selectImage = this.selectImage.bind(this);
-    this.lyricSearch = this.lyricSearch.bind(this);
+    // this.lyricSearch = this.lyricSearch.bind(this);
+    this.chooseSong = this.chooseSong.bind(this);
+    this.checkSongLyrics = this.checkSongLyrics.bind(this);
+    this.setTrackIds = this.setTrackIds.bind(this)
   }
 
   selectImage() {
@@ -75,46 +80,84 @@ export default class App extends Component {
     });
   }
 
-  lyricSearch(tag, evt) {
+  setTrackIds(tag, evt){
     mxm.searchTrack({ q_lyrics: tag, f_lyrics_language: 'en' })
       .then(res => {
-        const index = getRandomInt(res.message.body.track_list.length)
-        const trackId = res.message.body.track_list[index].track.track_id
-        const trackArtist = res.message.body.track_list[index].track.artist_name
-        this.setState({artist: trackArtist})
-        return trackId;
-      })
-      .then(id => {
-        let results = [];
-        mxm.getTrackLyrics(id)
-          .then(res => {
-            return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
-          })
-          .then(lyricArray => {
-            lyricArray.forEach(lyric => {
-              let line = lyric.split(' ');
-              let found = line.find(word => {
-                if (word[word.length - 1] === ',') {
-                  word = word.slice(-1);
-                }
-                return tag === word.toLowerCase()
-              });
-              if (found && line.length > 2) {
-                results.push(lyric)
-              }
-            })
-            if (!results.length) {
-              let index = getRandomInt(lyricArray.length - 4)
-              if (lyricArray[index] && lyricArray[index].split(' ').length > 2) {
-                results.push(lyricArray[index]);
-              } else {
-                results.push('Oops! Try Again!')
-              }
-            }
-            this.setState({ lyricText: results[getRandomInt(results.length)] })
-          })
+        let ids = [];
+        res.message.body.track_list.forEach(song => {
+          ids.push(song.track.track_id);
+        })
+        this.setState({songs: ids})
+        .then(_ => this.chooseSong(tag))
       })
   }
+
+  chooseSong(tag) {
+      const index = getRandomInt(this.state.songs.length);
+      let id = this.state.songs[index];
+      this.setState({selectedSongId: id})
+      .then(_ => {
+        return this.checkSongLyrics(this.state.selectedSongId, tag)
+      })
+    }
+
+  checkSongLyrics(id, tag){
+      let results = [];
+      mxm.getTrackLyrics(id)
+      .then(res => {
+        return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
+      })
+      .then(lyricArray => {
+        lyricArray.forEach(lyric => {
+          let line = lyric.split(' ');
+          let found = line.find(word => {
+            if (word[word.length - 1] === ',') {
+              word = word.slice(-1);
+            }
+            return tag === word.toLowerCase()
+          });
+          if (found && line.length > 2) {
+            results.push(lyric)
+          }
+        })
+        if(!results.length){
+          return this.chooseSong(tag)
+        } else {
+          this.setState({ lyricText: results[getRandomInt(results.length)] })
+        }
+      })
+  }
+      // .then(id => {
+      //   let results = [];
+      //   mxm.getTrackLyrics(id)
+      //     .then(res => {
+      //       return res.message.body.lyrics.lyrics_body.split(/\r?\n/)
+      //     })
+      //     .then(lyricArray => {
+      //       lyricArray.forEach(lyric => {
+      //         let line = lyric.split(' ');
+      //         let found = line.find(word => {
+      //           if (word[word.length - 1] === ',') {
+      //             word = word.slice(-1);
+      //           }
+      //           return tag === word.toLowerCase()
+      //         });
+      //         if (found && line.length > 2) {
+      //           results.push(lyric)
+      //         }
+      //       })
+  //           if (!results.length) {
+  //             let index = getRandomInt(lyricArray.length - 4)
+  //             if (lyricArray[index] && lyricArray[index].split(' ').length > 2) {
+  //               results.push(lyricArray[index]);
+  //             } else {
+  //               results.push('Oops! Try Again!')
+  //             }
+  //           }
+  //           this.setState({ lyricText: results[getRandomInt(results.length)] })
+  //         })
+  //     })
+  // }
   
   writeToCliipboard = async () => {
     await Clipboard.setString(this.state.lyricText)
@@ -146,7 +189,7 @@ export default class App extends Component {
           {this.state.tagText.map((tag, i) => {
             return (
               <Button
-                onPress={() => this.lyricSearch(tag)}
+                onPress={() => this.setTrackIds(tag)}
                 key={i}
                 title={`#${tag}`}
                 style={styles.tag}
