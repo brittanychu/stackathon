@@ -63,7 +63,9 @@ export default class App extends Component {
         console.log('ImagePicker Error: ', response.error);
       }
       else {
+        console.log('res',response)
         this.setState({ imageSource: response.uri.replace('file://', ''), tagText: [], lyricText: '' })
+        
         app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data }).then(
           (res) => {
             let tags = [];
